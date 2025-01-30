@@ -34,20 +34,15 @@ export class KoaTemplateService extends TemplateService<KoaApiHandlerParameters,
   async apiHandler(params: KoaApiHandlerParameters) {
     const { methodName, controller, context, validatedArgs, successStatus } = params;
 
-    try {
-      const data = await this.buildPromise(methodName, controller, validatedArgs);
-      let statusCode = successStatus;
-      let headers;
+    const data = await this.buildPromise(methodName, controller, validatedArgs);
+    let statusCode = successStatus;
+    let headers;
 
-      if (this.isController(controller)) {
-        headers = controller.getHeaders();
-        statusCode = controller.getStatus() || statusCode;
-      }
-      return this.returnHandler({ context, headers, statusCode, data });
-    } catch (error: any) {
-      context.status = error.status || 500;
-      context.throw(context.status, error.message, error);
+    if (this.isController(controller)) {
+      headers = controller.getHeaders();
+      statusCode = controller.getStatus() || statusCode;
     }
+    return this.returnHandler({ context, headers, statusCode, data });
   }
 
   getValidatedArgs(params: KoaValidationArgsParameters): any[] {
